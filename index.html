@@ -160,8 +160,8 @@ button,input{font-family:inherit}
       <div class="row help" id="help"></div>
     </div>
     <div class="foot">
-      <p>設定存在這台電腦的瀏覽器裡，下次打開還在。改了組數或任務會重設目前進度。</p>
-      <div><button class="btn" id="restore" type="button">恢復預設</button>　<button class="btn" id="cancel" type="button">取消</button>　<button class="btn p" id="save" type="button">儲存並回到計分板</button></div>
+      <p>設定存在這台電腦的瀏覽器裡，下次打開還在。改了組數或任務會重設目前進度。<br>「恢復預設」只還原設定；要讓倒數和各組進度從頭來，按「重設進度」。</p>
+      <div><button class="btn danger" id="reset-progress" type="button">重設進度</button>　<button class="btn" id="restore" type="button">恢復預設</button>　<button class="btn" id="cancel" type="button">取消</button>　<button class="btn p" id="save" type="button">儲存並回到計分板</button></div>
     </div>
   </div>
 </div>
@@ -354,7 +354,7 @@ function renderEditor(){
     <button class="btn mv up" type="button" title="上移" ${j===0?"disabled":""}>▲</button><button class="btn mv down" type="button" title="下移" ${j===M-1?"disabled":""}>▼</button>
     <input class="in s set-ic" value="${esc(t.ic)}"><input class="in w set-tn" value="${esc(t.tn)}"><button class="btn d del" type="button" ${M<=1?"disabled":""}>刪除</button></div>`).join("");
   $("add-task").disabled=M>=MAX_TASKS;
-  $("help").innerHTML=`空白鍵或點倒數數字：開始／暫停倒數<br>1～${ed.teams.length}（對應組別）或點該組卡片：完成本關<br>卡片上的 ${ICON_BACK.replace('class="ico"','class="ico inl"')}退回（或 Shift＋數字）：退回一關<br>R：重設（會先確認）　F：全螢幕　S：打開這個設定頁　Esc：關閉`;
+  $("help").innerHTML=`空白鍵或點倒數數字：開始／暫停倒數<br>1～${ed.teams.length}（對應組別）或點該組卡片：完成本關<br>卡片上的 ${ICON_BACK.replace('class="ico"','class="ico inl"')}退回（或 Shift＋數字）：退回一關<br>R 或設定頁的「重設進度」：倒數與各組進度從頭來（會先確認）　F：全螢幕　S：打開這個設定頁　Esc：關閉`;
 }
 function readEditor(){
   ed.title=$("set-title").value;ed.sub=$("set-sub").value;ed.min=$("set-min").value;ed.sec=$("set-sec").value;ed.warn=$("set-warn").value;
@@ -382,6 +382,7 @@ $("set-task-list").addEventListener("click",e=>{
 $("restore").onclick=()=>{const d=clone(DEF);ed={title:d.title,sub:d.sub,min:"25",sec:"00",warn:String(d.warn),teams:d.teams,tasks:d.tasks};
   ed.min=String(Math.floor(d.total/60)).padStart(2,"0");ed.sec=String(d.total%60).padStart(2,"0");renderEditor()};
 $("cancel").onclick=closeSettings;
+$("reset-progress").onclick=()=>askConfirm("要重設計分板嗎？倒數會回到 "+mmss(cfg.total)+"，各組進度清空。（設定頁還沒儲存的修改不會套用）","重設",()=>{closeSettings();resetAll()});
 $("save").onclick=()=>{
   readEditor();
   const total=Math.max(1,clampInt(ed.min,0,99,0)*60+clampInt(ed.sec,0,59,0));
